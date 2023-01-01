@@ -7,3 +7,4 @@ data/case_*/imaging.nii.gz
 *.yaml 
 *.nii
 *.LAPTOP-*
+*.ckpt

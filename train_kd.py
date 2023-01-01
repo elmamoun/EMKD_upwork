@@ -15,12 +15,12 @@ from pytorch_lightning.loggers import TensorBoardLogger
 
 seed.seed_everything(123)
 parser = argparse.ArgumentParser('train_kd')
-parser.add_argument('--train_data_path', type=str, default='/data/kits/train')
-parser.add_argument('--test_data_path', type=str, default='/data/kits/test')
-parser.add_argument('--checkpoint_path', type=str, default='/data/checkpoints')
+parser.add_argument('--train_data_path', type=str, default='data/kits/train')
+parser.add_argument('--test_data_path', type=str, default='data/kits/test')
+parser.add_argument('--checkpoint_path', type=str, default='data/checkpoints')
 parser.add_argument('--batch_size', type=int, default=16)
 parser.add_argument('--mode', type=str, default='train')
-parser.add_argument('--tckpt', type=str, default='/data/checkpoints/checkpoint_kits_tumor_enet_epoch=18.ckpt', help='teacher model checkpoint path')
+parser.add_argument('--tckpt', type=str, default='data/checkpoints/checkpoint_kits_tumor_enet_epoch=18.ckpt', help='teacher model checkpoint path')
 parser.add_argument('--smodel', type=str, default='enet')
 parser.add_argument('--dataset', type=str, default='kits', choices=['kits', 'lits'])
 parser.add_argument('--task', type=str, default='tumor', choices=['tumor', 'organ'])
@@ -112,14 +112,14 @@ def main():
     )
 
     logger = TensorBoardLogger('log', name='%s_%s_kd_%s' % (args.dataset, args.task, args.smodel))
-    trainer = Trainer.from_argparse_args(args, max_epochs=args.epochs, gpus=[8], callbacks=checkpoint_callback, logger=logger)
+    trainer = Trainer.from_argparse_args(args, max_epochs=args.epochs, callbacks=checkpoint_callback, logger=logger)
     trainer.fit(model)
 
 
 def test():
     args = parser.parse_args()
     model = KDPL.load_from_checkpoint(checkpoint_path=os.path.join(args.checkpoint_path, 'last.ckpt'))
-    trainer = Trainer(gpus=args.gpu)
+    trainer = Trainer()
     trainer.test(model)
 
 

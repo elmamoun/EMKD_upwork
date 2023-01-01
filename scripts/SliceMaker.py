@@ -8,8 +8,8 @@ from multiprocessing.dummy import Pool
 
 
 parser = argparse.ArgumentParser(description='Slice Maker')
-parser.add_argument('--in_path', type=str, default='/data/kits19/data')
-parser.add_argument('--out_path', type=str, default='/data/kits/train')
+parser.add_argument('--in_path', type=str, default='data/kits19/data')
+parser.add_argument('--out_path', type=str, default='data/kits')
 parser.add_argument('--process_num', type=int, default=10)
 parser.add_argument('--dataset', type=str, default='kits', choices=['kits', 'lits'])
 parser.add_argument('--task', type=str, default='tumor', choices=['tumor', 'organ'])
@@ -19,7 +19,8 @@ args = parser.parse_args()
 
 
 def main():
-    if not os.path.exists(args.out_path):
+
+    if not os.path.exists(args.out_path):        
         os.mkdir(args.out_path)
     list_path = os.path.join(args.out_path, args.mode)
     if not os.path.exists(list_path):
@@ -29,7 +30,8 @@ def main():
         paths = glob(os.path.join(args.in_path, "case_*/imaging*.nii.gz"))
     elif args.dataset == 'lits':
         paths = glob(os.path.join(args.in_path, "volume-*.nii"))
-
+    print(args.in_path)
+    print(paths)
     pool = Pool(args.process_num)
     result = pool.map(make_slice, paths)
 

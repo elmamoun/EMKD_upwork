@@ -13,9 +13,9 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 seed.seed_everything(123)
 parser = argparse.ArgumentParser('train')
-parser.add_argument('--train_data_path', type=str, default='/data/kits/train')
-parser.add_argument('--test_data_path', type=str, default='/data/kits/test')
-parser.add_argument('--checkpoint_path', type=str, default='/data/checkpoints')
+parser.add_argument('--train_data_path', type=str, default='data/kits/train')
+parser.add_argument('--test_data_path', type=str, default='data/kits/test')
+parser.add_argument('--checkpoint_path', type=str, default='data/checkpoints')
 parser.add_argument('--batch_size', type=int, default=16)
 parser.add_argument('--mode', type=str, default='train')
 parser.add_argument('--model', type=str, default='raunet')
@@ -57,7 +57,8 @@ class SegPL(BasePLModel):
             dataset=self.hparams.dataset,
             task=self.hparams.task
         )
-        return DataLoader(dataset, batch_size=self.hparams.batch_size, num_workers=32, pin_memory=True, shuffle=True)
+        return DataLoader(dataset, batch_size=self.hparams.batch_size, num_workers=32,
+         pin_memory=True, shuffle=True, drop_last= True )
 
     def test_dataloader(self):
         dataset = SliceDataset(
@@ -92,14 +93,14 @@ def main():
     )
 
     logger = TensorBoardLogger('log', name='%s_%s_%s' % (args.dataset, args.task, args.model))
-    trainer = Trainer.from_argparse_args(args, max_epochs=args.epochs, gpus=[8], callbacks=checkpoint_callback, logger=logger)
+    trainer = Trainer.from_argparse_args(args, max_epochs=args.epochs,callbacks=checkpoint_callback, logger=logger)
     trainer.fit(model)
 
 
 def test():
     args = parser.parse_args()
     model = SegPL.load_from_checkpoint(checkpoint_path=os.path.join(args.checkpoint_path, 'last.ckpt'))
-    trainer = Trainer(gpus=[8])
+    trainer = Trainer()
     trainer.test(model)
 
 
